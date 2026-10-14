@@ -27,7 +27,7 @@
 }
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 84px;
+  scroll-padding-top: calc(84px + env(safe-area-inset-top, 0px));
 }
 body {
   margin: 0;
@@ -189,19 +189,39 @@ section {
 }
 
 /* nav */
+/* The bar sits on its own compositor layer, and the blurred backdrop only fades in and out.
+   Mobile Safari can lose the tap area of a fixed bar after the page scrolls by itself or when
+   backdrop-filter is switched on and off; taps then miss until the user scrolls by hand. */
 .nav {
   position: fixed;
   inset: 0 0 auto;
   z-index: 50;
   padding-top: env(safe-area-inset-top, 0px);
   color: var(--paper);
-  transition: background 0.3s, box-shadow 0.3s;
+  transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
-.nav.is-solid {
+.nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: rgba(14, 17, 21, 0.95);
   backdrop-filter: blur(14px) saturate(1.4);
   -webkit-backdrop-filter: blur(14px) saturate(1.4);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.nav.is-solid::before {
+  opacity: 1;
+}
+.nav a,
+.nav button {
+  touch-action: manipulation;
 }
 .nav-row {
   display: flex;
@@ -307,8 +327,11 @@ section {
   }
   .nav.is-open {
     background: var(--ink);
+    max-height: 100vh;
     max-height: 100dvh;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
   }
 }

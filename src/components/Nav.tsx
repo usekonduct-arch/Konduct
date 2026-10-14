@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
+import { flushSync } from "react-dom";
 import Logo from "./Logo";
 
 const LINKS = [
@@ -17,8 +18,24 @@ export default function Nav() {
     const on = () => setSolid(window.scrollY > 24);
     on();
     window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
+    // Coming back to the page (back button, app switch) can restore a scroll position without a scroll event.
+    window.addEventListener("pageshow", on);
+    return () => {
+      window.removeEventListener("scroll", on);
+      window.removeEventListener("pageshow", on);
+    };
   }, []);
+
+  // While the phone menu is open the page behind it stays put, so swipes land on the menu.
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    const prev = root.style.overflow;
+    root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = prev;
+    };
+  }, [open]);
 
   // The phone menu closes on Escape and when the screen grows past the phone layout.
   useEffect(() => {
@@ -36,10 +53,24 @@ export default function Nav() {
 
   const close = () => setOpen(false);
 
+  // Menu links close the menu, wait for the page to unlock and settle, then scroll.
+  // Letting the browser jump while the menu is still collapsing leaves the bar's taps misplaced on phones.
+  const go = (e: MouseEvent<HTMLAnchorElement>) => {
+    const href = e.currentTarget.getAttribute("href");
+    const target = href && document.querySelector(href);
+    if (!target) return close();
+    e.preventDefault();
+    flushSync(close);
+    requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      history.pushState(null, "", href);
+    });
+  };
+
   return (
     <header className={`nav ${solid || open ? "is-solid" : ""} ${open ? "is-open" : ""}`}>
       <div className="wrap nav-row">
-        <a href="#top" aria-label="Konduct home" onClick={close}>
+        <a href="#top" aria-label="Konduct home" onClick={go}>
           <Logo />
         </a>
         <nav aria-label="Main">
@@ -64,13 +95,13 @@ export default function Nav() {
         <ul className="wrap">
           {LINKS.map(([label, href]) => (
             <li key={href}>
-              <a href={href} onClick={close}>
+              <a href={href} onClick={go}>
                 {label}
               </a>
             </li>
           ))}
           <li>
-            <a className="btn btn-yellow" href="#join" onClick={close}>
+            <a className="btn btn-yellow" href="#join" onClick={go}>
               Join the pilot
             </a>
           </li>
