@@ -13,6 +13,7 @@ import Roadmap from "./components/Roadmap";
 import Faq from "./components/Faq";
 import Join from "./components/Join";
 import Footer from "./components/Footer";
+import TopUpReturn from "./components/TopUpReturn";
 
 export default function App() {
   useGSAP(() => {
@@ -42,6 +43,7 @@ export default function App() {
         <Join />
       </main>
       <Footer />
+      <TopUpReturn />
     </>
   );
 }

@@ -2213,6 +2213,65 @@ section {
   font-size: 0.85rem;
 }
 
+/* back from a Bachs top-up checkout */
+.topup-return {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(14, 17, 21, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.topup-card {
+  width: min(100%, 400px);
+  padding: 2rem 1.5rem 1.25rem;
+  border-radius: 28px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+  display: grid;
+  gap: 0.9rem;
+  justify-items: center;
+}
+.topup-card h2 {
+  margin: 0;
+  font: 800 1.9rem/1 var(--display);
+  letter-spacing: -0.03em;
+}
+.topup-card p {
+  margin: 0;
+  color: #5d636b;
+}
+.topup-card .btn {
+  width: 100%;
+  margin-top: 0.4rem;
+}
+.topup-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--yellow);
+  font: 800 1.8rem var(--display);
+}
+.topup-icon.is-ok {
+  background: #19b86a;
+  color: #fff;
+}
+.topup-close {
+  border: 0;
+  background: none;
+  padding: 0.6rem;
+  font: 600 0.95rem var(--body);
+  color: #5d636b;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* scroll reveal (only when motion is allowed and JS has run) */
 .motion [data-reveal] {
   opacity: 0;
