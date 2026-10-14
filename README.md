@@ -27,10 +27,18 @@ position, the wheels stay in sync.
 
 ## Pilot sign-up form
 
-`Join.tsx` POSTs `{ role, name, contact, source }` as JSON to `VITE_WAITLIST_URL`.
-**Until that env var is set, submissions are not stored anywhere** (the form still shows the thank-you
-state and logs a warning to the console). Point it at a backend endpoint, a Google Apps Script,
-or a form service before launch.
+`Join.tsx` saves each sign-up (`role`, `name`, `contact`, `source`, server `createdAt`) to the
+`waitlist` collection in Firestore (project `konduct-10ffb`) through `src/lib/waitlist.ts`. The rule in
+`konduct-backend/firestore.rules` lets a browser add a well-formed entry and nothing else, so
+**deploy the rules once** before the form works:
+`firebase deploy --only firestore:rules --project konduct-10ffb` (from `konduct-backend`).
+Read sign-ups in the Firebase console → Firestore → `waitlist`. A hidden honeypot field drops most bots.
+Override the project with `VITE_FIREBASE_PROJECT_ID` / `VITE_FIREBASE_API_KEY`.
+
+## Social links
+
+Icons for WhatsApp, Instagram, X, LinkedIn and TikTok sit in the footer (`src/components/Socials.tsx`).
+Put each profile URL in `SOCIALS`; an icon with no URL shows greyed out as "coming soon".
 
 ## Copy facts to confirm before launch
 

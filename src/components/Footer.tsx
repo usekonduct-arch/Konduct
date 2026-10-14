@@ -1,4 +1,5 @@
 import Logo from "./Logo";
+import Socials from "./Socials";
 
 export default function Footer() {
   return (
@@ -7,6 +8,7 @@ export default function Footer() {
         <div>
           <Logo />
           <p>Cashless campus transport. Piloting at UNIOSUN, then campus by campus.</p>
+          <Socials />
         </div>
         <nav aria-label="Footer">
           <a href="#how">How it works</a>

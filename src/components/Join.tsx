@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import Bus from "./art/Bus";
+import { joinWaitlist, type SignUp } from "../lib/waitlist";
 
 const ROLES = [
   ["student", "Student"],
@@ -7,27 +8,20 @@ const ROLES = [
   ["park", "Owner or park leader"],
 ] as const;
 
-// Where pilot sign-ups are POSTed. Unset means nothing is stored yet (see README).
-const ENDPOINT = import.meta.env.VITE_WAITLIST_URL as string | undefined;
-
 type State = "idle" | "sending" | "done" | "error";
 
 export default function Join() {
-  const [role, setRole] = useState<string>("student");
+  const [role, setRole] = useState<SignUp["role"]>("student");
   const [state, setState] = useState<State>("idle");
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    const payload = { role, name: data.get("name"), contact: data.get("contact"), source: "landing" };
+    // Bots fill every field; people never see this one.
+    if (data.get("website")) return setState("done");
     setState("sending");
     try {
-      if (ENDPOINT) {
-        const res = await fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-        if (!res.ok) throw new Error(String(res.status));
-      } else {
-        console.warn("VITE_WAITLIST_URL is not set; sign-up not stored", payload);
-      }
+      await joinWaitlist({ role, name: String(data.get("name")).trim(), contact: String(data.get("contact")).trim() });
       setState("done");
     } catch {
       setState("error");
@@ -57,8 +51,9 @@ export default function Join() {
                 </label>
               ))}
             </fieldset>
-            <input type="text" name="name" placeholder="Your name" autoComplete="name" required aria-label="Your name" />
-            <input type="text" name="contact" placeholder="Phone number or email" autoComplete="tel" required aria-label="Phone number or email" />
+            <input type="text" name="name" placeholder="Your name" autoComplete="name" required minLength={2} maxLength={80} aria-label="Your name" />
+            <input type="text" name="contact" placeholder="Phone number or email" autoComplete="tel" required minLength={5} maxLength={120} aria-label="Phone number or email" />
+            <input className="hp" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
             <button className="btn btn-dark" type="submit" disabled={state === "sending"}>
               {state === "sending" ? "Adding you…" : "Join the pilot list"}
             </button>
