@@ -1,4 +1,4 @@
-const QA = [
+export const QA = [
   {
     q: "What is Konduct, in one line?",
     a: "A cashless way to pay for campus shuttles and bikes. You keep a wallet in the app, scan the code on the vehicle, and the fare reaches the driver in seconds.",

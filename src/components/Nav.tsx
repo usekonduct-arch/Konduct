@@ -4,13 +4,16 @@ import Logo from "./Logo";
 
 const LINKS = [
   ["How it works", "#how"],
-  ["Pay for friends", "#squad"],
   ["Drivers", "#drivers"],
   ["Safety", "#trust"],
+  ["Blog", "/blog"],
+  ["Careers", "/careers"],
   ["FAQ", "#faq"],
 ];
 
-export default function Nav() {
+/** On other pages, section links go back to the home page; `current` marks the page you're on. */
+export default function Nav({ home = true, current }: { home?: boolean; current?: string }) {
+  const href = (h: string) => (h.startsWith("#") && !home ? "/" + h : h);
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -57,7 +60,7 @@ export default function Nav() {
   // Letting the browser jump while the menu is still collapsing leaves the bar's taps misplaced on phones.
   const go = (e: MouseEvent<HTMLAnchorElement>) => {
     const href = e.currentTarget.getAttribute("href");
-    const target = href && document.querySelector(href);
+    const target = href?.startsWith("#") ? document.querySelector(href) : null;
     if (!target) return close();
     e.preventDefault();
     flushSync(close);
@@ -70,20 +73,22 @@ export default function Nav() {
   return (
     <header className={`nav ${solid || open ? "is-solid" : ""} ${open ? "is-open" : ""}`}>
       <div className="wrap nav-row">
-        <a href="#top" aria-label="Konduct home" onClick={go}>
+        <a href={home ? "#top" : "/"} aria-label="Konduct home" onClick={home ? go : undefined}>
           <Logo />
         </a>
         <nav aria-label="Main">
           <ul>
-            {LINKS.map(([label, href]) => (
-              <li key={href}>
-                <a href={href}>{label}</a>
+            {LINKS.map(([label, h]) => (
+              <li key={h}>
+                <a href={href(h)} aria-current={current === h ? "page" : undefined}>
+                  {label}
+                </a>
               </li>
             ))}
           </ul>
         </nav>
         <div className="nav-actions">
-          <a className="btn btn-yellow btn-sm nav-cta" href="#join">
+          <a className="btn btn-yellow btn-sm nav-cta" href={href("#join")}>
             Join the pilot
           </a>
           <button className="nav-toggle" type="button" aria-expanded={open} aria-controls="nav-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen((o) => !o)}>
@@ -93,15 +98,15 @@ export default function Nav() {
       </div>
       <nav id="nav-menu" className="nav-menu" aria-label="Menu" hidden={!open}>
         <ul className="wrap">
-          {LINKS.map(([label, href]) => (
-            <li key={href}>
-              <a href={href} onClick={go}>
+          {LINKS.map(([label, h]) => (
+            <li key={h}>
+              <a href={href(h)} onClick={go} aria-current={current === h ? "page" : undefined}>
                 {label}
               </a>
             </li>
           ))}
           <li>
-            <a className="btn btn-yellow" href="#join" onClick={go}>
+            <a className="btn btn-yellow" href={href("#join")} onClick={go}>
               Join the pilot
             </a>
           </li>

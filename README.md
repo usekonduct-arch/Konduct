@@ -5,10 +5,39 @@ React 19 + TypeScript + Vite, with GSAP for the SVG animation.
 
 ```
 npm install
-npm run dev       # http://localhost:5180
-npm run build     # type-check + production build into dist/
-npm run preview   # serve dist/ on :5180
+npm run dev       # http://localhost:5180 (client-rendered, no blog data)
+npm run build     # type-check, build, then pre-render every page into dist/
+npm run preview   # serve dist/ like Vercel does (clean URLs, rewrites, 404) on :5180
+PRERENDER_SAMPLE=1 npm run build   # build with sample posts and jobs, for a local look
 ```
+
+## Pages, blog, careers and SEO
+
+Every address is real, pre-rendered HTML (`scripts/prerender.mjs`, run by `npm run build`):
+`/`, `/terms`, `/privacy`, `/delete-account`, `/blog`, `/blog/<slug>`, `/careers`, `/careers/<slug>`, and `404.html`.
+The build reads published posts and jobs from Firestore, renders each page with React on the server,
+writes its head tags (`src/lib/seo.ts`: title, description, canonical, Open Graph, X card, robots,
+schema.org Organization / WebSite / MobileApplication / FAQPage / Blog / BlogPosting / JobPosting /
+BreadcrumbList), and writes `sitemap.xml` (with images), `robots.txt` and the RSS feed `blog/feed.xml`.
+Blog covers are copied next to the pages so they load from the CDN, not the API server.
+
+- **Content** is written in the staff console (Website blog, Careers & applicants) and saved through
+  the backend (`konduct-backend/functions/src/domain/site.ts`). Bodies are Markdown (`src/lib/markdown.ts`,
+  escaped, so a post can't inject HTML).
+- **Publishing rebuilds the site** when the backend has `SITE_DEPLOY_HOOK` set to a Vercel deploy hook
+  (Vercel → Project → Settings → Git → Deploy Hooks). Until the rebuild lands, `vercel.json` sends unknown
+  `/blog/<slug>` and `/careers/<slug>` to shells that load the content in the browser (kept out of search).
+- **Applications** go straight into Firestore `applications`; the rules check the shape and that the role is
+  open. CVs are links (Drive, LinkedIn…): the free Firebase plan has no file storage.
+- **Legal documents** live in `src/content/legal.ts`. Fill in `COMPANY` (registered name, RC number, address)
+  and create the mailboxes it names. If you change them in a way people must re-accept, bump `LEGAL_VERSION`
+  there and `AppConfig.legalVersion` in both apps.
+- **Deploy order:** deploy the Firestore rules first (`firebase deploy --only firestore:rules` from
+  konduct-backend). Until then the build fails with `posts 403`, on purpose: a site without its blog
+  would drop every post from search.
+- **After launch:** add the site to Google Search Console and Bing Webmaster Tools and submit
+  `https://konduct.com.ng/sitemap.xml`. Put the social profile links in `src/components/Socials.tsx`;
+  they also feed the Organization `sameAs` that ties the profiles to the site in Google.
 
 ## Where things are
 

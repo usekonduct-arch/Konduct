@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Bachs sends riders back here after the hosted checkout (TOPUP_RETURN_URL on the backend), with
@@ -8,10 +8,12 @@ import { useState } from "react";
 const APP_LINK = "intent://wallet#Intent;scheme=konduct;package=com.konduct.rider;end";
 
 export default function TopUpReturn() {
-  const [outcome, setOutcome] = useState(() => {
+  // Read after the first render: the page is pre-rendered without the query string.
+  const [outcome, setOutcome] = useState<"success" | "cancel" | null>(null);
+  useEffect(() => {
     const q = new URLSearchParams(window.location.search);
-    return q.get("topup") ? (q.get("outcome") === "success" ? "success" : "cancel") : null;
-  });
+    if (q.get("topup")) setOutcome(q.get("outcome") === "success" ? "success" : "cancel");
+  }, []);
   if (!outcome) return null;
 
   const close = () => {

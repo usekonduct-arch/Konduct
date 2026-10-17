@@ -1,49 +1,27 @@
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import Nav from "./components/Nav";
-import Hero from "./components/Hero";
-import Tape from "./components/Tape";
-import Problem from "./components/Problem";
-import HowItWorks from "./components/HowItWorks";
-import Squad from "./components/Squad";
-import Drivers from "./components/Drivers";
-import Trust from "./components/Trust";
-import Roadmap from "./components/Roadmap";
-import Faq from "./components/Faq";
-import Join from "./components/Join";
-import Footer from "./components/Footer";
-import TopUpReturn from "./components/TopUpReturn";
+import Home from "./pages/Home";
+import LegalPage from "./pages/LegalPage";
+import { BlogIndex, PostPage } from "./pages/Blog";
+import { CareersIndex, JobPage } from "./pages/Careers";
+import NotFound from "./pages/NotFound";
+import type { Route } from "./lib/route";
+import type { PageData } from "./lib/seo";
 
-export default function App() {
-  useGSAP(() => {
-    if (!document.documentElement.classList.contains("motion")) return;
-    ScrollTrigger.batch("[data-reveal]", {
-      start: "top 88%",
-      once: true,
-      onEnter: (els) => gsap.to(els, { opacity: 1, y: 0, duration: 0.9, stagger: 0.09, ease: "power3.out", overwrite: true }),
-    });
-    // Fonts change line heights after first paint; re-measure trigger positions once they land.
-    document.fonts?.ready.then(() => ScrollTrigger.refresh());
-  });
-
-  return (
-    <>
-      <Nav />
-      <main id="top">
-        <Hero />
-        <Tape />
-        <Problem />
-        <HowItWorks />
-        <Squad />
-        <Drivers />
-        <Trust />
-        <Roadmap />
-        <Faq />
-        <Join />
-      </main>
-      <Footer />
-      <TopUpReturn />
-    </>
-  );
+/** One page per address. `data` is what the pre-renderer loaded; without it, pages fetch their own. */
+export default function App({ route, data }: { route: Route; data: PageData }) {
+  switch (route.name) {
+    case "home":
+      return <Home />;
+    case "legal":
+      return <LegalPage doc={route.doc} />;
+    case "blog":
+      return <BlogIndex posts={data.posts} />;
+    case "post":
+      return <PostPage slug={route.slug} post={data.post} related={data.related} />;
+    case "careers":
+      return <CareersIndex jobs={data.jobs} />;
+    case "job":
+      return <JobPage slug={route.slug} job={data.job} />;
+    case "notfound":
+      return <NotFound />;
+  }
 }
