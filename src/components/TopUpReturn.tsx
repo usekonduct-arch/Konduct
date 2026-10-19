@@ -10,6 +10,7 @@ const APP_LINK = "intent://wallet#Intent;scheme=konduct;package=com.konduct.ride
 export default function TopUpReturn() {
   // Read after the first render: the page is pre-rendered without the query string.
   const [outcome, setOutcome] = useState<"success" | "cancel" | null>(null);
+  const [closeHint, setCloseHint] = useState(false);
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     if (q.get("topup")) setOutcome(q.get("outcome") === "success" ? "success" : "cancel");
@@ -21,6 +22,17 @@ export default function TopUpReturn() {
     setOutcome(null);
   };
   const ok = outcome === "success";
+
+  // The web app opens the checkout in its own tab: closing it puts the rider back in the app. If the
+  // tab stays open, this is a browser on its own: the Android app's link, or a note elsewhere.
+  const backToApp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.close();
+    setTimeout(() => {
+      if (/Android/i.test(navigator.userAgent)) window.location.href = APP_LINK;
+      else setCloseHint(true);
+    }, 300);
+  };
 
   return (
     <div className="topup-return" role="dialog" aria-modal="true" aria-labelledby="topup-return-title">
@@ -34,9 +46,10 @@ export default function TopUpReturn() {
             ? "Your wallet updates in the Konduct app within a minute, as soon as the bank confirms."
             : "Nothing was charged. Go back to the app and try again when you're ready."}
         </p>
-        <a className="btn btn-yellow" href={APP_LINK}>
+        <a className="btn btn-yellow" href={APP_LINK} onClick={backToApp}>
           Back to the Konduct app
         </a>
+        {closeHint && <p>Close this tab to go back to Konduct.</p>}
         <button className="topup-close" type="button" onClick={close}>
           Stay on the website
         </button>
