@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
  * ?topup=<id>&outcome=success|cancel. Show what happened and a way back into the app. The wallet is
  * credited from Bachs's signed webhook, not from this page.
  */
-const APP_LINK = "intent://wallet#Intent;scheme=konduct;package=com.konduct.rider;end";
+const APP_LINK = "intent://wallet#Intent;scheme=konduct;end";
 
 export default function TopUpReturn() {
   // Read after the first render: the page is pre-rendered without the query string.
