@@ -89,7 +89,7 @@ export const TERMS: LegalDoc = {
         {
           list: [
             "Wallet limits apply and depend on your verification level. At the basic level the maximum balance is ₦50,000, you can add up to ₦20,000 a day and spend up to ₦10,000 a day. Your app shows your current limits.",
-            "You can withdraw your balance to a Nigerian bank account in your own name. The first withdrawal to a newly added account waits 24 hours as a security check. Withdrawals have a minimum of ₦500.",
+            "You can withdraw your balance to a Nigerian bank account in your own name. The first withdrawal to a newly added account waits 24 hours as a security check. Withdrawals have a minimum of ₦500, and you can make one withdrawal a day.",
             "We do not charge riders a fee to add money, pay a fare or withdraw during the pilot. If that changes we will tell you in advance and show any fee before you confirm.",
           ],
         },

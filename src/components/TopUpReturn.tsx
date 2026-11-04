@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 /**
- * Bachs sends riders back here after the hosted checkout (TOPUP_RETURN_URL on the backend), with
+ * Paystack sends riders back here after the hosted checkout (TOPUP_RETURN_URL on the backend), with
  * ?topup=<id>&outcome=success|cancel. Show what happened and a way back into the app. The wallet is
- * credited from Bachs's signed webhook, not from this page.
+ * credited from Paystack's signed webhook, not from this page.
  */
 const APP_LINK = "intent://wallet#Intent;scheme=konduct;end";
 

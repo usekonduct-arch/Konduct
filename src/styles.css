@@ -2213,7 +2213,7 @@ section {
   font-size: 0.85rem;
 }
 
-/* back from a Bachs top-up checkout */
+/* back from a Paystack top-up checkout */
 .topup-return {
   position: fixed;
   inset: 0;
